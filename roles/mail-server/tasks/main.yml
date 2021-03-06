@@ -1,0 +1,354 @@
+---
+- name: Packages needed for mail server installed
+  openbsd_pkg:
+    name: [
+      'opensmtpd-extras',
+      'opensmtpd-filter-rspamd',
+      'dovecot',
+      'dovecot-pigeonhole',
+      'rspamd',
+      'redis']
+    state: present
+
+- name: hosts file updated
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ public_server_address }}\t{{ mail_server }}\n{{ public_server_address }}\tmta-sts.{{ domain }}"
+
+- name: pf.rules deployed
+  template:
+    src: pf.rules
+    dest: /etc/pf.anchors/
+    owner: root
+    group: wheel
+    mode: 0600
+    backup: no
+  notify:
+    - restart pf
+
+- name: pf anchor reloaded
+  shell: "/sbin/pfctl -a pf.rules -F Tables && /sbin/pfctl -a pf.rules -f /etc/pf.anchors/pf.rules"
+  changed_when: false
+  check_mode: no
+
+- name: credentials file created or reset
+  copy:
+    content: ''
+    dest: /etc/mail/credentials
+    force: yes
+    owner: _smtpd
+    group: _dovecot
+    mode: '0440'
+    backup: yes
+
+- name: credentials generated
+  shell: "sh /etc/mail/generate-credentials.sh {{ item.account }} {{ item.password }}"
+  ignore_errors: true
+  changed_when: false
+  check_mode: no
+  loop: "{{ secret_credentials }}"
+  no_log: true
+
+# - name: credentials read/write permissions set
+#   file:
+#     path: /etc/mail/credentials
+#     state: touch
+#     owner: _smtpd
+#     group: _dovecot
+#     mode: '0440'
+
+- name: vmail user created
+  user:
+    name: vmail
+    comment: "Virtual Mail Account"
+    home: /var/vmail
+    create_home: no
+    shell: /sbin/nologin
+    uid: 2000
+    login_class: staff
+
+- name: mailname file created
+  copy:
+    content: "{{ mail_server }}"
+    dest: /etc/mail/mailname
+    force: yes
+    owner: _smtpd
+    group: _dovecot
+    mode: '0440'
+    backup: yes
+
+- name: virtuals home directory created
+  file:
+    path: /var/vmail
+    state: directory
+    owner: vmail
+    group: vmail
+    mode: '0750'
+
+- name: virtuals deployed
+  template:
+    src: virtuals
+    dest: /etc/mail/
+    owner: root
+    group: wheel
+    mode: '0644'
+    backup: no
+
+- name: users added to virtuals
+  lineinfile:
+    path: /etc/mail/virtuals
+    line: "{{ item.account }}@{{ domain }}: vmail"
+    create: yes
+  no_log: true
+  loop: "{{ secret_credentials }}"
+
+- name: keygen.sh script deployed
+  template:
+    src: keygen.sh
+    dest: /etc/mail/
+    owner: root
+    group: wheel
+    mode: 0755
+    backup: no
+
+- name: acme client conf deployed
+  template:
+    src: acme-client.conf
+    dest: /etc/
+    owner: root
+    group: wheel
+    mode: 0644
+    backup: yes
+
+- name: httpd.conf deployed
+  template:
+    src: httpd.conf
+    dest: "/etc/"
+    backup: yes
+
+- name: httpd service started and enabled
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: relayd.conf deployed
+  template:
+    src: relayd.conf
+    dest: "/etc/"
+    owner: root
+    group: wheel
+    mode: 0600
+    backup: yes
+
+- name: relayd service started and enabled
+  service:
+    name: relayd
+    state: started
+    enabled: yes
+
+- name: Let's Encrypt mail server certificate requested
+  shell: acme-client -v {{ mail_server }}
+  ignore_errors: true
+  changed_when: false
+  check_mode: no
+
+- name: mail server SSL certificate renewal added to cron
+  cron:
+    name: mail server certificate ssl renewal
+    minute: "~"
+    hour: "~"
+    day: "{{ range(1, 28) | random }}"
+    job: "/usr/sbin/acme-client -v {{ mail_server }} && /usr/sbin/rcctl restart smtpd && /usr/sbin/rcctl restart dovecot"
+    user: root
+
+- name: Let's Encrypt MTA-STS server certificate requested
+  shell: acme-client -v mta-sts.{{ domain }}
+  ignore_errors: true
+  changed_when: false
+  check_mode: no
+
+- name: MTA-STS web directory created
+  file:
+    path: /var/www/htdocs/mta-sts
+    owner: www
+    group: www
+    state: directory
+    mode: 0755
+
+- name: MTA-STS web directory created
+  file:
+    path: /var/www/htdocs/mta-sts/.well-known
+    owner: www
+    group: www
+    state: directory
+    mode: 0755
+
+- name: mta-sts.txt deployed
+  template:
+    src: mta-sts.txt
+    dest: /var/www/htdocs/mta-sts/.well-known
+    owner: www
+    group: www
+    mode: 0644
+    backup: yes
+    newline_sequence: '\r\n'
+
+- name: mta-sts SSL certificate renewal added to cron
+  cron:
+    name: mta-sts certificate ssl renewal update
+    minute: "~"
+    hour: "~"
+    day: "{{ range(1, 28) | random }}"
+    job: "/usr/sbin/acme-client -v mta-sts.{{ domain }} && /usr/sbin/rcctl reload relayd"
+    user: root
+
+- name: SRS key generated
+  shell: openssl rand -base64 30
+  ignore_errors: true
+  changed_when: false
+  check_mode: no
+  no_log: true
+  register: srs_key
+
+- name: smptd.conf deployed
+  template:
+    src: smtpd.conf
+    dest: /etc/mail/
+    owner: root
+    group: wheel
+    mode: 0644
+    backup: no
+  notify:
+    - restart smtpd
+
+- name: dns_records.txt deployed
+  template:
+    src: dns_records.txt
+    dest: "/home/{{ admin_account }}/"
+    owner: "{{ admin_account }}"
+    group: admins
+    mode: 0644
+    backup: yes
+
+- name: dovecot login class created
+  blockinfile:
+    path: /etc/login.conf
+    block: |
+      dovecot:\
+        :openfiles-cur=1024:\
+        :openfiles-max=2048:\
+        :tc=daemon:
+    backup: yes
+
+- name: dovecot local.conf deployed
+  template:
+    src: local.conf
+    dest: /etc/dovecot/
+    backup: no
+
+- name: dovecot 10-ssl.conf edited
+  replace:
+    path: /etc/dovecot/conf.d/10-ssl.conf
+    regexp: "{{ item }}"
+    replace: '#\1'
+  with_items:
+    - '^(ssl_cert = </etc/ssl/dovecotcert.pem)$'
+    - '^(ssl_key = </etc/ssl/private/dovecot.pem)$'
+
+- name: dovecot ham and spam sieve files created
+  template:
+    src: "{{ item }}"
+    dest: /usr/local/lib/dovecot/sieve/
+    backup: yes
+  with_items:
+    - report-ham.sieve
+    - report-spam.sieve
+
+- name: dovecot ham and spam sieve files compiled
+  shell: "cd /usr/local/lib/dovecot/sieve/ && sievec {{ item }}"
+  with_items:
+    - report-ham.sieve
+    - report-spam.sieve
+
+- name: dovecot ham and spam sieve scripts deployed
+  template:
+    src: "{{ item }}"
+    dest: /usr/local/lib/dovecot/sieve/
+    mode: 0755
+    backup: yes
+  with_items:
+    - sa-learn-ham.sh
+    - sa-learn-spam.sh
+
+- name: dovecot service started and enabledi
+  service:
+    name: dovecot
+    state: started
+    enabled: yes
+
+- name: rspamd dkim directory created
+  file:
+    path: /etc/mail/dkim
+    state: directory
+    owner: root
+    group: wheel
+
+- name: rspamd-keygen.sh script deployed
+  template:
+    src: rspamd-keygen.sh
+    dest: /etc/mail/
+    owner: root
+    group: wheel
+    mode: 0755
+    backup: no
+
+- name: rspamd-keygen.sh script run
+  shell: sh /etc/mail/rspamd-keygen.sh
+  ignore_errors: true
+  changed_when: false
+  check_mode: no
+  no_log: true
+
+- set_fact:
+    dkim_public_key: "{{ {{ lookup('file', '/etc/mail/dkim/public.key') }} | regex_replace('\n', '') }}"
+
+- name: dkim DNS record added to dns_records file
+  lineinfile:
+    path: "/home/{{ admin_account }}/dns_records.txt"
+    line: "default._domainkey.{{ domain }}. IN TXT \"v=DKIM1;k=rsa;p={{ dkim_public_key }}\"
+{{ domain }}. IN TXT \"v=spf1 a ip4:{{ public_server_address }} mx include:sendgrid.net ~all\""
+    create: yes
+
+- name: dmarc DNS record added to dns_records file
+  lineinfile:
+    path: "/home/{{ admin_account }}/dns_records.txt"
+    line: '_dmarc.{{ domain }}. IN TXT "v=DMARC1; p=reject; pct=100;rua=mailto:postmaster@{{ domain }}"'
+    create: yes
+
+- name: dkim_signing.conf deployed
+  template:
+    src: dkim_signing.conf
+    dest: /etc/rspamd/local.d/
+    mode: 0640
+    backup: yes
+
+- name: spam filtering services started and enabled
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - redis
+    - rspamd
+
+- name: smptd.conf deployed
+  template:
+    src: smtpd.conf_rspamd
+    dest: /etc/mail/
+    owner: root
+    group: wheel
+    mode: 0644
+    backup: no
+  notify:
+    - restart smtpd
