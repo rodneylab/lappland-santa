@@ -1,5 +1,7 @@
 admin_account: lappland
+domain: example.com
 gcloud: {region: us-west1}
+mail_server: mail.example.com
 ssh_port: 1551
-vpn_peers: [desktop, laptop, phone, tablet]
+wg_peers: [desktop, laptop, phone, tablet]
 wg_port: 51820

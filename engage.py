@@ -163,6 +163,8 @@ def main():
             subprocess.check_call(command, stdout=fout, env=env_copy)
 
     env_copy['LAPPLAND_SERVER_IP'] = get_lappland_ip()
+    env_copy['MAIL_CLIENTS'] = get_config_parameter(
+        'mail_clients', parameters, "0.0.0.0/0")
     env_copy['SSH_PRIVATE_KEY_FILE'] = get_ssh_key_name()
     env_copy['SSH_CLIENTS'] = get_config_parameter(
         'ssh_clients', parameters, firewall_select_source)
