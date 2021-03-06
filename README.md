@@ -1,21 +1,21 @@
-# 🔒 Lappland VPN
+# 📮 Lappland Santa
 **WARNING** this project is still under development.  Some functionality may not behave as expected. Do not rely on any output generated. ❗️
 
-Lappland VPN is a security-focused, self-hosted, cloud VPN running on OpenBSD.  OpenBSD is a <a aria-label="Learn more about Open B S D" href="https://www.openbsd.org/" target="_blank" rel="noopener noreferrer">proactively secure</a> operating UNIX-like system.  The VPN only supports the modern, <a aria-label="Open the WireGuard project website" href="https://www.wireguard.com/" target="_blank" rel="noopener noreferrer">secure and fast WireGuard</a> protocol which itself only employs strong cryptographic algorithms.
+Lappland Santa is a security-focused, self-hosted, cloud mail server running on OpenBSD.  OpenBSD is a <a aria-label="Learn more about Open B S D" href="https://www.openbsd.org/" target="_blank" rel="noopener noreferrer">proactively secure</a> UNIX-like operating system.  The mail server supports modern protocols like IMAP and uses trusted tools like Dovecot, OpenSMTPD, RSpamD and Redis to deliver reliability and security.
 
 ## ☁️ Cloud Platform Setup
 Currently only Google Cloud is supported.  Follow the <a href="./docs/gcloud.md">Google Cloud Platform setup instructions</a> before creating your cloud VPN instance.
 
-## 🔌 Lappland VPN setup
+## 🔌 Lappland Santa setup
 1. Clone this repo:
 ```bash
-git clone https://github.com/rodneylab/lappland-vpn.git
+git clone https://github.com/rodneylab/lappland-santa.git
 ```
 
 2. Install core dependencies:
 - OpenBSD
 ```bash
-pkg_add jq python py3-pip terraform
+pkg_add python py3-pip terraform
 ln -sf /usr/local/bin/bin/pip3 /usr/local/bin/pip
 pip install --user --upgrade virtualenv
 ```
@@ -41,5 +41,5 @@ sh lappland.sh
 ```
 
 
-## 🍭Congratulations
-You have set up you new Lappland VPN. ☕️ Sit Back and browse the internet privately and securely with your new VPN!
+## 🍭 Congratulations
+You have set up you new Lappland Santa mail server. ☕️ Sit back and wait for the fan mail to start rolling in!
