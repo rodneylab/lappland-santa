@@ -17,9 +17,9 @@ cd /root/git
 /usr/bin/ssh-keyscan -H github.com >> /root/.ssh/known_hosts
 
 # Clone playbook
-if [ -d "/root/git/lappland-vpn" ]
+if [ -d "/root/git/lappland-santa" ]
 then
-  cd "/root/git/lappland-vpn" && /usr/local/bin/git pull --rebase
+  cd "/root/git/lappland-santa" && /usr/local/bin/git pull --rebase
 else
-  /usr/local/bin/git clone "https://github.com/rodneylab/lappland-vpn.git"
+  /usr/local/bin/git clone "https://github.com/rodneylab/lappland-santa.git"
 fi
