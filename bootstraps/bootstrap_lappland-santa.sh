@@ -4,7 +4,7 @@
 instance_type=$(/usr/local/bin/curl -s \
   --resolve metadata.google.internal:80:169.254.169.254 \
   -H "Metadata-Flavor: Google" \
-  http://metadata.google.internal/computeMetadata/v1/instance/attributes/ssh-keys)
+  http://metadata.google.internal/computeMetadata/v1/instance/attributes/instance-type)
 
 # check we do not want to install lappland-vpn instead
 get_instance_type() {
