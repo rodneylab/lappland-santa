@@ -117,12 +117,3 @@
     group: wheel
     mode: 0644
     backup: no
-
-- name: /etc/rc.shutdown deployed
-  template:
-    src: rc.shutdown
-    dest: /etc/
-    owner: root
-    group: wheel
-    mode: 0644
-    backup: no
