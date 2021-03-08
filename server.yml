@@ -71,6 +71,10 @@
         tags: mail
 
       - import_role:
+          name: mail-server
+        tags: mail-server
+
+      - import_role:
           name: ids
         tags: ids
 
@@ -83,5 +87,6 @@
         tags: monitoring
 
       - import_role:
-          name: cloudflare-warp
-        tags: cloudflare-warp
+          name: hardening
+        tags: hardening
+
