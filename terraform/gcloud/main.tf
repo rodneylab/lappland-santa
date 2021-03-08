@@ -4,6 +4,7 @@ variable "image_file" {}
 variable "image_name" {}
 variable "image_family" { default = "openbsd-amd64-68" }
 variable "lappland_id" { default = "lappland" }
+variable "mail_server" {}
 variable "project_id" {}
 variable "region" {}
 variable "server_name" {}
@@ -99,19 +100,19 @@ resource "google_compute_instance" "lappland_vpn" {
   }
 
   metadata = {
-    ssh-keys    = var.ssh_key
+    instance-type = "lappland-santa"
     lappland-id = var.lappland_id
+    ssh-keys    = var.ssh_key
   }
 
   network_interface {
     network = google_compute_network.vpc_network.name
     access_config {
       nat_ip = google_compute_address.static.address
-      # type         = "ONE_TO_ONE_NAT"
       network_tier = "PREMIUM"
+      public_ptr_domain_name = var.mail_server
     }
   }
-  # depends_on = [google_project_service.service]
 }
 
 output "instance_id" {
