@@ -102,14 +102,14 @@
   no_log: true
   loop: "{{ secret_credentials }}"
 
-- name: keygen.sh script deployed
-  template:
-    src: keygen.sh
-    dest: /etc/mail/
-    owner: root
-    group: wheel
-    mode: 0755
-    backup: no
+# - name: keygen.sh script deployed
+#   template:
+#     src: keygen.sh
+#     dest: /etc/mail/
+#     owner: root
+#     group: wheel
+#     mode: 0755
+#     backup: no
 
 - name: acme client conf deployed
   template:
@@ -281,7 +281,7 @@
     - sa-learn-ham.sh
     - sa-learn-spam.sh
 
-- name: dovecot service started and enabledi
+- name: dovecot service started and enabled
   service:
     name: dovecot
     state: started
@@ -303,14 +303,24 @@
     mode: 0755
     backup: no
 
-- name: rspamd-keygen.sh script run
-  shell: sh /etc/mail/rspamd-keygen.sh
-  ignore_errors: true
-  changed_when: false
-  check_mode: no
-  no_log: true
+- name: rspamd private key generated
+  openssl_privatekey:
+    path: /etc/mail/dkim/{{ domain }}.key
+    size: 1024
+    owner: root
+    group: _rspamd
+    mode: '0440'
 
-- set_fact:
+- name: rspamd public key generated
+  openssl_publickey:
+    path: /etc/mail/dkim/public.key
+    privatekey_path: /etc/mail/dkim/{{ domain }}.key
+    owner: root
+    group: _rspamd
+    mode: '0644'
+
+- name: DKIM public key set
+  set_fact:
     dkim_public_key: "{{ {{ lookup('file', '/etc/mail/dkim/public.key') }} | regex_replace('\n', '') }}"
 
 - name: dkim DNS record added to dns_records file
