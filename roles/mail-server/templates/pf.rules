@@ -70,9 +70,6 @@ pass in on egress proto tcp to egress:0 port $ssh_port \
 # accept mail from other MTAs
 pass in quick on egress proto tcp from any to egress:0 port = 25
 
-# relay mail for delivery
-pass in quick on egress proto tcp from any to egress:0 port = 465
-
 # submission from mail user agents
 pass in quick on egress proto tcp from <mail_clients_public> \
   to egress:0 port { 465, 587} flags S/SA modulate state \
@@ -82,6 +79,9 @@ pass in quick on egress proto tcp from <mail_clients_public> \
 pass in quick on $public proto tcp from <mail_clients_public> \
   to egress:0 port = 993 flags S/SA modulate state \
   (max-src-conn 50, max-src-conn-rate 100/5, overload <bruteforce> flush global)
+
+# let's enncypt
+pass in quick on egress proto tcp from any to egress:0 port { 80, 443 }
 
 pass in quick on egress proto udp from <wguard_peers_public> \
   to egress:0 port = {{ wireguard_port }}

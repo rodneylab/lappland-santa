@@ -294,18 +294,18 @@
     owner: root
     group: wheel
 
-- name: rspamd-keygen.sh script deployed
-  template:
-    src: rspamd-keygen.sh
-    dest: /etc/mail/
-    owner: root
-    group: wheel
-    mode: 0755
-    backup: no
+# - name: rspamd-keygen.sh script deployed
+#   template:
+#     src: rspamd-keygen.sh
+#     dest: /etc/mail/
+#     owner: root
+#     group: wheel
+#     mode: 0755
+#     backup: no
 
 - name: rspamd private key generated
   openssl_privatekey:
-    path: /etc/mail/dkim/{{ domain }}.key
+    path: /etc/mail/dkim/private.key
     size: 1024
     owner: root
     group: _rspamd
@@ -314,7 +314,7 @@
 - name: rspamd public key generated
   openssl_publickey:
     path: /etc/mail/dkim/public.key
-    privatekey_path: /etc/mail/dkim/{{ domain }}.key
+    privatekey_path: /etc/mail/dkim/private.key
     owner: root
     group: _rspamd
     mode: '0644'
@@ -362,3 +362,29 @@
     backup: no
   notify:
     - restart smtpd
+
+- name: OpenSMTP secrets deployed
+  template:
+    src: secrets
+    dest: /etc/mail
+    owner: root
+    group: _smtpd
+    mode: '0640'
+    backup: no
+  when: "secretsdb.rc == 1"
+  no_log: True
+  notify:
+    - restart smtpd
+
+- name: secrets db created
+  shell: "cd /etc/mail && /usr/sbin/makemap secrets"
+  args:
+    creates: /etc/mail/secrets.db
+  when: "secretsdb.rc == 1"
+  notify:
+    - restart smtpd
+
+- name: secrets file removed
+  file:
+    state: absent
+    path: /etc/mail/secrets
