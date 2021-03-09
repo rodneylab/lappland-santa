@@ -15,6 +15,17 @@ terraform {
   }
 }
 
+resource "google_project_service" "service" {
+  for_each = toset([
+    "cloudresourcemanager.googleapis.com"
+  ])
+
+  service = each.key
+
+  project            = var.project_id
+  disable_on_destroy = false
+}
+
 resource "google_storage_bucket" "lappland-openbsd-images" {
   name                        = var.bucket
   location                    = "EUROPE-WEST2"
