@@ -58,3 +58,9 @@ gsutil ls ${BUCKET}
 ```bash
 gsutil iam ch serviceAccount:lappland-santa@${PROJECT_ID}.iam.gserviceaccount.com:objectViewer ${BUCKET}
 ```
+
+Prove ownership of your domain before continuing.  You can do this by going to:
+
+<a aria-label="Example link for proving domain ownership with Google" href="https://www.google.com/webmasters/verification/verification?domain=mail.example.com" rel="nofollow noopener noreferrer">https://www.google.com/webmasters/verification/verification?domain=mail.example.com</a>.
+
+where mail.example.com is the domain you will use for your mail server.  This is needed in order to set the PTR record on the server.  To stay verified, do not remove the DNS record, even after verification succeeds.
