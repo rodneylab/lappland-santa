@@ -66,8 +66,8 @@ def get_vpn_peers(parameters, server_address):
     wg_subnet = IPv4Network(str(server_address) + "/24", False)
     addresses_dict = {}
     peer_array = []
-    if 'vpn_peers' in parameters:
-        for peer in parameters['vpn_peers']:
+    if 'wg_peers' in parameters:
+        for peer in parameters['wg_peers']:
             new_address = IPv4Address(
                 wg_subnet.network_address + randint(1, 254))
             while (new_address in addresses_dict) or (
@@ -83,7 +83,7 @@ def get_vpn_peers(parameters, server_address):
         return '[' + ','.join(peer_array) + ']'
     else:
         print(
-            '"vpn_peers" entry is missing in config file.  '
+            '"wg_peers" entry is missing in config file.  '
             + 'Please check the file.')
         return ''
 
@@ -136,6 +136,8 @@ def main():
     env_copy['TF_VAR_image_name'] = 'openbsd-amd64-68-210227'
     env_copy['TF_VAR_image_file'] = 'openbsd-amd64-68-210227.tar.gz'
     env_copy['TF_VAR_image_family'] = 'openbsd-amd64-68'
+    env_copy['TF_VAR_mail_server'] = get_config_parameter(
+        'mail_server', parameters, '')
 
     env_copy['TF_VAR_bucket'] = 'lappland-openbsd-images-2021-03-02'
     env_copy['TF_VAR_project_id'] = os.getenv('GOOGLE_PROJECT')
