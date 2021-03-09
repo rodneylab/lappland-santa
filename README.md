@@ -29,7 +29,7 @@ brew install hashicorp/tap/terraform
 
 3. Install remaining dependencies
 ```bash
-cd lappland-vpn
+cd lappland-santa
 python3 -m virtualenv --python="$(command -v python3)" .env && \
     . .env/bin/activate && python3 -m pip install -U pip virtualenv && \
     python3 -m pip install -r requirements.txt
