@@ -33,9 +33,10 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
 ```
 **Attention**: take care of the credentials file, which contains the credentials to manage your Google Cloud account, including create and delete servers on this project.
 
-- Enable the compute service:
+- Enable the APIs:
 ```bash
 gcloud services enable compute.googleapis.com
+gcloud services enable cloudresourcemanager.googleapis.com
 ```
 
 ### Create a bucket for the image and upload it:
