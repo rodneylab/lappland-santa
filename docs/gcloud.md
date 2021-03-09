@@ -55,5 +55,5 @@ gsutil ls ${BUCKET}
 ```
 ### Grant service account permission to pull image from the bucket:
 ```bash
-gsutil iam ch serviceAccount:lappland-vpn@${PROJECT_ID}.iam.gserviceaccount.com:objectViewer ${BUCKET}
+gsutil iam ch serviceAccount:lappland-santa@${PROJECT_ID}.iam.gserviceaccount.com:objectViewer ${BUCKET}
 ```
