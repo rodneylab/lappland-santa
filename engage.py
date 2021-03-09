@@ -187,10 +187,6 @@ def main():
     env_copy['WIREGUARD_SUBNET'] = wireguard_subnet
     env_copy['PEERS'] = get_vpn_peers(parameters, wireguard_address)
 
-    response = input("Do you accept wgcf Terms of Service? (yes/no) ")
-    if response != 'yes':
-        return
-
     command = ['sh', 'server.sh']
     subprocess.check_call(command, env=env_copy)
 
