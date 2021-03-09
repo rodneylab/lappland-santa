@@ -31,7 +31,7 @@ provider "google" {
   region  = var.region
 }
 
-resource "google_compute_image" "lappland_vpn_image" {
+resource "google_compute_image" "lappland_santa_image" {
   name = var.image_name
   raw_disk {
     source = "gs://${var.bucket}/${var.image_file}"
@@ -47,7 +47,7 @@ resource "google_compute_network" "vpc_network" {
 }
 
 resource "google_compute_firewall" "default" {
-  name          = "lapplandvpn"
+  name          = "lapplandsanta"
   network       = google_compute_network.vpc_network.name
   direction     = "INGRESS"
   source_ranges = split(",", var.firewall_select_source)
@@ -59,7 +59,7 @@ resource "google_compute_firewall" "default" {
     protocol = "udp"
     ports    = [var.wg_port]
   }
-  target_tags = ["lappland-vpn"]
+  target_tags = ["lappland-santa"]
 }
 
 resource "google_compute_address" "static" {
@@ -68,7 +68,7 @@ resource "google_compute_address" "static" {
 
 resource "google_project_service" "service" {
   for_each = toset([
-    "cloudresourcemanager.googleapis.com"
+    "cloudresourcemanager.googleapis.com",
     "compute.googleapis.com"
   ])
 
@@ -87,34 +87,34 @@ resource "random_shuffle" "zones" {
   result_count = 1
 }
 
-resource "google_compute_instance" "lappland_vpn" {
+resource "google_compute_instance" "lappland_santa" {
   name         = var.server_name
   zone         = random_shuffle.zones.result[0]
   machine_type = "f1-micro"
-  tags         = ["lappland-vpn"]
+  tags         = ["lappland-santa"]
 
   boot_disk {
     initialize_params {
-      image = google_compute_image.lappland_vpn_image.self_link
+      image = google_compute_image.lappland_santa_image.self_link
     }
   }
 
   metadata = {
     instance-type = "lappland-santa"
-    lappland-id = var.lappland_id
-    ssh-keys    = var.ssh_key
+    lappland-id   = var.lappland_id
+    ssh-keys      = var.ssh_key
   }
 
   network_interface {
     network = google_compute_network.vpc_network.name
     access_config {
-      nat_ip = google_compute_address.static.address
-      network_tier = "PREMIUM"
+      nat_ip                 = google_compute_address.static.address
+      network_tier           = "PREMIUM"
       public_ptr_domain_name = var.mail_server
     }
   }
 }
 
 output "instance_id" {
-  value = google_compute_instance.lappland_vpn.self_link
+  value = google_compute_instance.lappland_santa.self_link
 }
