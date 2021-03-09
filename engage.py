@@ -148,6 +148,17 @@ def main():
     env_copy['TF_VAR_ssh_key'] = admin_account + ':' \
         + get_ssh_public_key(get_ssh_key_name())
 
+    with set_directory(Path('./terraform/gcloud/image')):
+        subprocess.check_call(['terraform', 'init'], env=env_copy)
+        with open('../../terraform-image-plan.log', 'w') as fout:
+            command = ['terraform', 'plan']
+            subprocess.check_call(command, stdout=fout, env=env_copy)
+
+        subprocess.check_call(['terraform', 'apply'], env=env_copy)
+        with open('../../terraform-image-output.json', 'w') as fout:
+            command = ['terraform', 'output', '-json']
+            subprocess.check_call(command, stdout=fout, env=env_copy)
+
     with set_directory(Path('./terraform/gcloud')):
         subprocess.check_call(['terraform', 'init'], env=env_copy)
         with open('../../terraform-plan.log', 'w') as fout:
