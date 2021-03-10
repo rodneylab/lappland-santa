@@ -46,18 +46,40 @@ resource "google_compute_network" "vpc_network" {
   routing_mode = "REGIONAL"
 }
 
-resource "google_compute_firewall" "default" {
+resource "google_compute_firewall" "lapplandsanta" {
   name          = "lapplandsanta"
   network       = google_compute_network.vpc_network.name
   direction     = "INGRESS"
   source_ranges = split(",", var.firewall_select_source)
   allow {
     protocol = "tcp"
-    ports    = [var.ssh_port]
+    ports    = [var.ssh_port, "587", "993"]
   }
   allow {
     protocol = "udp"
     ports    = [var.wg_port]
+  }
+  target_tags = ["lappland-santa"]
+}
+
+resource "google_compute_firewall" "lapplandsantaweb" {
+  name      = "lapplandsantaweb"
+  network   = google_compute_network.vpc_network.name
+  direction = "INGRESS"
+  allow {
+    protocol = "tcp"
+    ports    = ["80", "443"]
+  }
+  target_tags = ["lappland-santa"]
+}
+
+resource "google_compute_firewall" "lapplandsantamta" {
+  name      = "lapplandsantamta"
+  network   = google_compute_network.vpc_network.name
+  direction = "INGRESS"
+  allow {
+    protocol = "tcp"
+    ports    = ["25", "465"]
   }
   target_tags = ["lappland-santa"]
 }
