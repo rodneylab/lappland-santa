@@ -296,7 +296,7 @@
   template:
     src: "{{ item }}"
     dest: /usr/local/lib/dovecot/sieve/
-    mode: 0755
+    mode: '0755'
     backup: yes
   with_items:
     - sa-learn-ham.sh
@@ -342,7 +342,7 @@
 
 - name: DKIM public key set
   set_fact:
-    dkim_public_key: "{{ {{ lookup('file', '/etc/mail/dkim/public.key') }} | regex_replace('\n', '') }}"
+    dkim_public_key: "{{ lookup('file', '/etc/mail/dkim/public.key') | regex_replace('\n', '') }}"
 
 - name: dkim DNS record added to dns_records file
   lineinfile:
