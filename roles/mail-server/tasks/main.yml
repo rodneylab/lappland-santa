@@ -39,9 +39,9 @@
     content: ''
     dest: /etc/mail/credentials
     force: yes
-    owner: _smtpd
+    owner: roor
     group: _dovecot
-    mode: '0440'
+    mode: '0640'
     backup: yes
 
 - name: credentials generated
@@ -52,13 +52,13 @@
   loop: "{{ secret_credentials }}"
   no_log: true
 
-# - name: credentials read/write permissions set
-#   file:
-#     path: /etc/mail/credentials
-#     state: touch
-#     owner: _smtpd
-#     group: _dovecot
-#     mode: '0440'
+- name: credentials read/write permissions set
+  file:
+    path: /etc/mail/credentials
+    state: touch
+    owner: _smtpd
+    group: _dovecot
+    mode: '0440'
 
 - name: vmail user created
   user:
@@ -114,19 +114,16 @@
 #     mode: 0755
 #     backup: no
 
-- name: acme client conf deployed
-  template:
-    src: acme-client.conf
-    dest: /etc/
-    owner: root
-    group: wheel
-    mode: 0644
-    backup: yes
+- name: Check relayd is not running
+  service:
+    name: relayd
+    state: stopped
+    enabled: yes
 
 - name: httpd.conf deployed
   template:
-    src: httpd.conf
-    dest: "/etc/"
+    src: httpd_www.conf
+    dest: "/etc/httpd.conf"
     backup: yes
 
 - name: httpd service started and enabled
@@ -135,20 +132,14 @@
     state: started
     enabled: yes
 
-- name: relayd.conf deployed
+- name: acme client conf deployed
   template:
-    src: relayd.conf
-    dest: "/etc/"
+    src: acme-client.conf
+    dest: /etc/
     owner: root
     group: wheel
-    mode: 0600
+    mode: 0644
     backup: yes
-
-- name: relayd service started and enabled
-  service:
-    name: relayd
-    state: started
-    enabled: yes
 
 - name: Let's Encrypt mail server certificate requested
   shell: acme-client -v {{ mail_server }}
@@ -206,15 +197,20 @@
     job: "/usr/sbin/acme-client -v mta-sts.{{ domain }} && /usr/sbin/rcctl reload relayd"
     user: root
 
-- name: relayd.conf file updated
-  blockinfile:
-    block: |
-      relay "wwwsecure4" {
-      listen on egress port 443 tls
-      protocol "https"
-      forward to 127.0.0.1 port 8080
-    path: /etc/relayd.conf
+- name: relayd.conf deployed
+  template:
+    src: relayd.conf
+    dest: "/etc/"
+    owner: root
+    group: wheel
+    mode: 0600
     backup: yes
+
+- name: relayd service started and enabled
+  service:
+    name: relayd
+    state: started
+    enabled: yes
 
 - name: SRS key generated
   shell: openssl rand -base64 30

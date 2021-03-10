@@ -1,0 +1,7 @@
+MX {{ domain }}. 20 {{ mail_server }}.
+{{ mail_server }}	A {{ lappland_server_ip }}
+_smtp._tls.{{ domain }}. TXT "v=TLSRPTv1; rua=mailto:admin@{{ domain }}"
+_mta-sts.{{ domain }}. TXT "v=STSv1; id={{ ansible_date_time.iso8601_basic_short }}"
+mta-sts.{{ domain }}. A {{ lappland_server_ip }}
+mta-sts.{{ domain }}. CAA 128 issue "letsencrypt.org"
+{{ mail_server }}. CAA 128 issue "letsencrypt.org"
