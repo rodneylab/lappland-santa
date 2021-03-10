@@ -39,10 +39,9 @@
 - name: Configure the server and install required software
   hosts: vpn-host
   gather_facts: true
-  include_vars:
-    - secrets_credentials.yml
   become: true
   tasks:
+    - include_vars: secrets_credentials.yml
     - block:
       - name: Wait until the infrastructure build and initialisation is complete
         wait_for:
