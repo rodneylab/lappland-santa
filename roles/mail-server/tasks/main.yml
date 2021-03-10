@@ -206,6 +206,16 @@
     job: "/usr/sbin/acme-client -v mta-sts.{{ domain }} && /usr/sbin/rcctl reload relayd"
     user: root
 
+- name: relayd.conf file updated
+  blockinfile:
+    block: |
+      relay "wwwsecure4" {
+      listen on egress port 443 tls
+      protocol "https"
+      forward to 127.0.0.1 port 8080
+    path: /etc/relayd.conf
+    backup: yes
+
 - name: SRS key generated
   shell: openssl rand -base64 30
   ignore_errors: true
