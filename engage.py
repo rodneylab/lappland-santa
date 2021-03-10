@@ -172,6 +172,8 @@ def main():
             command = ['terraform', 'output', '-json']
             subprocess.check_call(command, stdout=fout, env=env_copy)
 
+    env_copy['LAPPLAND_DOMAIN'] = get_config_parameter(
+        'domain', parameters, "example.com")
     env_copy['LAPPLAND_SERVER_IP'] = get_lappland_ip()
     env_copy['MAIL_CLIENTS'] = get_config_parameter(
         'mail_clients', parameters, "0.0.0.0/0")
