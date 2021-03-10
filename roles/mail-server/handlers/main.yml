@@ -1,4 +1,10 @@
+- name: restart pf
+  command: /sbin/pfctl -a pf.rules -F Tables && /sbin/pfctl -a pf.rules -f /etc/pf.anchors/pf.rules
+  register: pf_restart
+  failed_when: "pf_restart.rc == 1"
+
 - name: restart smtpd
   service:
     name: smtpd
     state: restarted
+
