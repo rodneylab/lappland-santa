@@ -44,12 +44,12 @@
   changed_when: false
   check_mode: no
 
-- name: sysctl ipv4 forwarding enabled
-  sysctl:
-    name: net.inet.ip.forwarding
-    value: '1'
-    state: present
-    reload: yes
+# - name: sysctl ipv4 forwarding enabled
+#   sysctl:
+#     name: net.inet.ip.forwarding
+#     value: '1'
+#     state: present
+#     reload: yes
 
 - name: wg0 interface brought up
   shell: sh /etc/netstart wg0
