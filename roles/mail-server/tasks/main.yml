@@ -1,21 +1,21 @@
 ---
 - name: Packages needed for mail server installed
   openbsd_pkg:
-    name: [
-      'opensmtpd-extras',
-      'opensmtpd-filter-rspamd',
-      'dovecot',
-      'dovecot-pigeonhole',
-      'rspamd',
-      'redis']
+    name:
+      - opensmtpd-extras
+      - opensmtpd-filter-rspamd
+      - dovecot
+      - dovecot-pigeonhole
+      - rspamd
+      - redis
     state: present
 
 - name: hosts file updated
   blockinfile:
-    path: /etc/hosts
     block: |
       {{ lappland_server_ip }}    {{ mail_server }}
       {{ lappland_server_ip }}    mta-sts.{{ domain }}
+    path: /etc/hosts
     backup: yes
 
 - name: pf.rules deployed
