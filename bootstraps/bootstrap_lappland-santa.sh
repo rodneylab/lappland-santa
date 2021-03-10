@@ -13,6 +13,7 @@ get_instance_type() {
       https://raw.githubusercontent.com/rodneylab/lappland-vpn/main/bootstraps/bootstrap_lappland-vpn.sh
     sh /root/git/lappland-vpn/bootstraps/bootstrap_lappland-vpn.sh
     exit 0
+  fi
 }
 
 # bootstrap the system
@@ -90,13 +91,6 @@ extra_vars=$( /usr/local/bin/jq -n \
 
 # Run playbook
 cd /root/git/lappland-santa/ && /usr/local/bin/ansible-playbook install.yml \
-  --tag=users, \
-        system, \
-        sysctl, \
-        pf-base, \
-        dnscrypt-proxy, \
-        unbound, \
-        hardening, \
-        reboot \
+  --tag=users,system,sysctl,pf-base,dnscrypt-proxy,unbound,hardening,reboot \
   --extra-vars="$extra_vars" 2>&1 | tee -a /var/log/bootstrap \
   && touch "/var/log/lappland-result.json"
