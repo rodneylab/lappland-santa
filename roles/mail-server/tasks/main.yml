@@ -13,7 +13,7 @@
 - name: hosts file updated
   lineinfile:
     path: /etc/hosts
-    line: "{{ public_server_address }}\t{{ mail_server }}\n{{ public_server_address }}\tmta-sts.{{ domain }}"
+    line: "{{ lappland_server_ip }}\t{{ mail_server }}\n{{ lappland_server_ip }}\tmta-sts.{{ domain }}"
 
 - name: pf.rules deployed
   template:
@@ -327,7 +327,7 @@
   lineinfile:
     path: "/home/{{ admin_account }}/dns_records.txt"
     line: "default._domainkey.{{ domain }}. IN TXT \"v=DKIM1;k=rsa;p={{ dkim_public_key }}\"
-{{ domain }}. IN TXT \"v=spf1 a ip4:{{ public_server_address }} mx include:sendgrid.net ~all\""
+{{ domain }}. IN TXT \"v=spf1 a ip4:{{ lappland_server_ip }} mx include:sendgrid.net ~all\""
     create: yes
 
 - name: dmarc DNS record added to dns_records file

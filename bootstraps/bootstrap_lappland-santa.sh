@@ -68,21 +68,21 @@ fi
 services_address="10.172.$((RANDOM % 254 + 1)).$((RANDOM % 254 + 1))"
 
 # Extra variables for playbook
-public_server_address=$(/usr/local/bin/curl -L https://diagnostic.opendns.com/myip)
+lappland_server_ip=$(/usr/local/bin/curl -L https://diagnostic.opendns.com/myip)
 public_net=$(ifconfig vio0 | grep inet | awk '{print $2}')
 extra_vars=$( /usr/local/bin/jq -n \
               --arg admin_account "$admin_account" \
               --arg admin_ssh_public_key "$admin_ssh_public_key" \
               --arg lappland_id "$lappland_id" \
-              --arg pub_add "$public_server_address" \
+              --arg pub_add "$lappland_server_ip" \
               --arg pub_net "$public_net" \
               --arg services_address "$services_address" \
               '{
                 "admin_account":$admin_account,
                 "admin_ssh_public_key":$admin_ssh_public_key,
                 "lappland_id":$lappland_id,
+                "lappland_server_ip":$pub_add,
                 "public_net":$pub_net,
-                "public_server_address":$pub_add,
                 "role_sysctl_task":"router_sysctl",
                 "services_address":$services_address,
                 "ssh_port":"1551",
