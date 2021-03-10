@@ -2,8 +2,9 @@
 - name: Check mandatory variables are defined
   assert:
     that:
-      - gmail_email is defined
-      - gmail_secret is defined
+      - secret_gmail_email is defined
+      - secret_gmail_secret is defined
+  no_log: True
 
 - name: mail server private key generated
   openssl_privatekey:

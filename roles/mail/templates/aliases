@@ -82,8 +82,8 @@ _slaacd: /dev/null
 sshd:   /dev/null
 
 # Well-known aliases -- these should be filled in!
-root: {{ gmail_email }}
-{{ admin_account }}: {{ gmail_email }}
+root: {{ secret_gmail_email }}
+{{ admin_account }}: {{ secret_gmail_email }}
 # manager:
 # dumper:
 
