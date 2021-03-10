@@ -114,14 +114,22 @@
   no_log: true
   loop: "{{ secret_credentials }}"
 
-# - name: keygen.sh script deployed
-#   template:
-#     src: keygen.sh
-#     dest: /etc/mail/
-#     owner: root
-#     group: wheel
-#     mode: 0755
-#     backup: no
+- name: mail server private key generated
+  openssl_privatekey:
+    path: /etc/ssl/private/smtp.sendgrid.com.key
+    owner: root
+    group: wheel
+    mode: '0600'
+
+- name: mail server certificates generated
+  community.crypto.x509_certificate:
+    path: /etc/ssl/smtp.sendgrid.com.crt
+    privatekey_path: /etc/ssl/private/smtp.sendgrid.com.key
+    provider: selfsigned
+    owner: root
+    group: wheel
+    mode: '0600'
+    selfsigned_not_after: "+365d"
 
 - name: Check relayd is not running
   service:
