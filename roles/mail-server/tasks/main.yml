@@ -44,7 +44,6 @@
     mode: '0640'
     backup: yes
 
-- name: credentials generated
 - name: generate-credentials script deployed
   template:
     src: generate-credentials.sh
@@ -54,6 +53,7 @@
     mode: 0755
     backup: no
 
+- name: credentials generated
   shell: "sh /etc/mail/generate-credentials.sh {{ item.account }} {{ item.password }}"
   ignore_errors: true
   changed_when: false
@@ -173,12 +173,12 @@
 
 - name: MTA-STS web directories created
   file:
-    path: {{ item }}
+    path: "{{ item }}"
     owner: www
     group: www
     state: directory
     mode: 0755
-  loop:
+  with_items:
     - /var/www/htdocs/mta-sts
     - /var/www/htdocs/mta-sts/.well-known
 
