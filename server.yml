@@ -39,6 +39,8 @@
 - name: Configure the server and install required software
   hosts: vpn-host
   gather_facts: true
+  vars_files:
+    - secrets_credentials.yml
   become: true
   tasks:
     - block:
