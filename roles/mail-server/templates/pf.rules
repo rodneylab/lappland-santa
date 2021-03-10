@@ -76,7 +76,7 @@ pass in quick on egress proto tcp from <mail_clients_public> \
   (max-src-conn 50, max-src-conn-rate 50/5, overload <bruteforce> flush global)
 
 # mua email access imaps
-pass in quick on $public proto tcp from <mail_clients_public> \
+pass in quick on egress proto tcp from <mail_clients_public> \
   to egress:0 port = 993 flags S/SA modulate state \
   (max-src-conn 50, max-src-conn-rate 100/5, overload <bruteforce> flush global)
 
@@ -102,7 +102,7 @@ pass in quick on $wguard proto tcp from $wguard:network \
   (max-src-conn 50, max-src-conn-rate 50/5, overload <bruteforce> flush global)
 
 # mua email access imaps
-pass in quick on $public proto tcp from $wguard:network \
+pass in quick on $wguard proto tcp from $wguard:network \
   to $wguard:0 port = 993 flags S/SA modulate state \
   (max-src-conn 50, max-src-conn-rate 100/5, overload <bruteforce> flush global)
 
