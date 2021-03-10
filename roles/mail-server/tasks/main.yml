@@ -39,7 +39,7 @@
     content: ''
     dest: /etc/mail/credentials
     force: yes
-    owner: roor
+    owner: root
     group: _dovecot
     mode: '0640'
     backup: yes
