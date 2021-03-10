@@ -132,7 +132,7 @@
     state: started
     enabled: yes
 
-- name: acme client conf deployed
+- name: acme-client.conf deployed
   template:
     src: acme-client.conf
     dest: /etc/
@@ -361,16 +361,16 @@
     - redis
     - rspamd
 
-- name: smptd.conf deployed
-  template:
-    src: smtpd.conf_rspamd
-    dest: /etc/mail/
-    owner: root
-    group: wheel
-    mode: 0644
-    backup: no
-  notify:
-    - restart smtpd
+# - name: smptd.conf deployed
+#   template:
+#     src: smtpd.conf_rspamd
+#     dest: /etc/mail/
+#     owner: root
+#     group: wheel
+#     mode: 0644
+#     backup: no
+#   notify:
+#     - restart smtpd
 
 - name: OpenSMTP secrets deployed
   template:
