@@ -11,9 +11,12 @@
     state: present
 
 - name: hosts file updated
-  lineinfile:
+  blockinfile:
     path: /etc/hosts
-    line: "{{ lappland_server_ip }}\t{{ mail_server }}\n{{ lappland_server_ip }}\tmta-sts.{{ domain }}"
+    block: |
+      {{ lappland_server_ip }}    {{ mail_server }}
+      {{ lappland_server_ip }}    mta-sts.{{ domain }}
+    backup: yes
 
 - name: pf.rules deployed
   template:
