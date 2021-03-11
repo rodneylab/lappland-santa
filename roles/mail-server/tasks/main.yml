@@ -397,7 +397,7 @@
     group: _smtpd
     mode: '0640'
     backup: no
-  when: "secretsdb.rc == 1"
+  # when: "secretsdb.rc == 1"
   no_log: True
   notify:
     - restart smtpd
@@ -406,7 +406,7 @@
   shell: "cd /etc/mail && /usr/sbin/makemap secrets"
   args:
     creates: /etc/mail/secrets.db
-  when: "secretsdb.rc == 1"
+  # when: "secretsdb.rc == 1"
   notify:
     - restart smtpd
 
