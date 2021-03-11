@@ -131,7 +131,7 @@
     mode: '0600'
     selfsigned_not_after: "+365d"
 
-- name: Check relayd is not running
+- name: Checked relayd is not running
   service:
     name: relayd
     state: stopped
@@ -315,15 +315,6 @@
     owner: root
     group: wheel
 
-# - name: rspamd-keygen.sh script deployed
-#   template:
-#     src: rspamd-keygen.sh
-#     dest: /etc/mail/
-#     owner: root
-#     group: wheel
-#     mode: 0755
-#     backup: no
-
 - name: rspamd private key generated
   openssl_privatekey:
     path: /etc/mail/dkim/private.key
@@ -377,17 +368,6 @@
   with_items:
     - redis
     - rspamd
-
-# - name: smptd.conf deployed
-#   template:
-#     src: smtpd.conf_rspamd
-#     dest: /etc/mail/
-#     owner: root
-#     group: wheel
-#     mode: 0644
-#     backup: no
-#   notify:
-#     - restart smtpd
 
 - name: OpenSMTP secrets deployed
   template:
