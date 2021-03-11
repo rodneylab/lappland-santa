@@ -336,15 +336,12 @@
     src: /etc/mail/dkim/public.key
   register: dkim_public_key
 
-# - name: DKIM public key set
-#   set_fact:
-#     dkim_public_key: "{{ lookup('file', '/etc/mail/dkim/public.key') | regex_replace('\n', '') }}"
-
 - name: dkim DNS record added to dns_records file
-  lineinfile:
+  blockinfile:
     path: "/home/{{ admin_account }}/dns_records.txt"
-    line: "default._domainkey.{{ domain }}. IN TXT \"v=DKIM1;k=rsa;p={{ dkim_public_key['content'] }}\"
-{{ domain }}. IN TXT \"v=spf1 a ip4:{{ lappland_server_ip }} mx include:sendgrid.net ~all\""
+    block: |
+      "default._domainkey.{{ domain }}. IN TXT \"v=DKIM1;k=rsa;p={{ dkim_public_key['content'] }}"
+      "{{ domain }}. IN TXT \"v=spf1 a ip4:{{ lappland_server_ip }} mx include:sendgrid.net ~all\""
     create: yes
 
 - name: dmarc DNS record added to dns_records file
