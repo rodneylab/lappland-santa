@@ -2,7 +2,74 @@
 
 ### Fix
 
+- **roles/wireguard-configs**: ✅ corrected templating parameter
+- 💫 changed handling of smtpd db it is now overwritten if it already exists
+
+## 0.3.0 (2021-03-10)
+
+### Fix
+
+- **terraform/gcloud**: ✅ added web and mail ports to their own firewalls
+- **roles/wireguard-configs**: ✅ fixed template parameter
+- **engage.py**: ✅ added missing environment variable from domain
+- **roles/mail-server**: 💫 improved registration of dkim public key
+- **roles/mail-server**: 💫 updated regex in task
+- **roles/mail-server**: ✅ generate sendgrid certificate and fixed error in dovecot config and smtpd tmplate
+- **roles/mail-server**: ✅ fixed typos in tasks
+- **roles/mail-server**: ✅ fixes in tasks and dovecot config
+- **roles/mail-server**: 💫 added missing file updated tasks
+- **roles/mail-server**: ✅ fixed typo in task
+- **roles/mail-server**: ✅ fixes to configuration files and task ordring
+- **server.yml**: ✅ fixed vars import
+- **server.yml**: ✅ fixed file import
+- **roles/mail-server**: ✅ fixed acme conf file
+- **roles/mail-server**: ✅ refactored deploy of relayd.conf and fixed typo
+- **server.sh**: ✅ added missing variable
+- **server.sh**: ✅ added missing variable
+- **roles/mail-server**: 💫 updated pf rules
+- **roles/mail-server**: 💫 updated handlers
+- **roles/mail**: ✅ switched task order so db is in place when aliases is run
+- **roles/mail-server**: 💫 updated task
+- **terraform/gcloud**: ✅ fixed typo
+- **server.yml**: 💫 added vars_files
+- **roles/mail**: ✅ fixed variable name
+- **roles/wireguard-configs**: 💫 removed IP forwarding
+- **roles/unbound**: 💫 updated unbound tasks - start unbound later
+- **bootstraps**: ✅ fixed typos and formatting
+- **terraform/gcloud**: ✅ fixed image link
+- **terraform/gcloud**: 💫 updated gcloud main terraform file
+- **engage.py**: 💫 updated engage script
+- **engage.py**: 💫 removed wgcf prompt from engage.py
+- **terraform/gcloud**: 💫 updated image terraform
+- **engage.py**: 💫 updated gcloud engage script to include image upload
+- **bootstraps**: ✅ fixed typo on instance type metadata fetch
+- **roles**: 💫 updated templates to reflect new secret naming convention
+- **roles/mail-server**: 💫 updated main task and multiple template files
+- **terraform/gcloud**: 💫 added new instance-type metadata and set PTR record for instance
+- **server.yml**: 💫 added hardening to configuration tasks
+- **roles/system**: 💫 updated path for sftp in sshd config, removed shutdown script, added sysmerge to doas
+- **roles/mail-server**: 💫 updated mail server
+- **roles/wireguard-pf**: 💫 updated pf rules
+- **root**: 💫 updated scripts for santa
+- **secrets**: 💫 updated secrets files
+- **bootstrap_raw**: 💫 updated bootstrap_raw for santa
+- **roles/unbound**: updated blocklist script to output smaller files
+- **roles/wireguard-configs**: 💫 added update to unbounf configuration to allow queries from WireGuard peers
+- **roles/mail**: ✅ fixed newaliases command
 - **roles/cloudflare-warp**: 💫 updated pf rules
+
+### Refactor
+
+- **roles/mail-server**: 🛁 reformatted tasks
+- 🛁 renamed variable server_public_address to lappland_server_ip
+- **roles/cloudflare-warp**: 💥 removed vpn role not needed by santa
+
+### Feat
+
+- **roles/ssh-secure**: ✨ added new advanced ssh-secure role
+- **engage.py**: ✨ updated engage.py to write system properties to files also linted file
+- **bootstrap**: ✨ added santa bootstrap
+- **role/mail-server**: ✨ added mail server role
 
 ## 0.2.0 (2021-03-05)
 
