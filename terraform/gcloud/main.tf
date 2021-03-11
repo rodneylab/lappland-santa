@@ -137,6 +137,6 @@ resource "google_compute_instance" "lappland_santa" {
   }
 }
 
-output "instance_id" {
-  value = google_compute_instance.lappland_santa.self_link
+output "external_ip" {
+  value = google_compute_instance.lappland_santa.network_interface.0.access_config.0.nat_ip
 }

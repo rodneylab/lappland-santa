@@ -1,10 +1,11 @@
 #!/usr/bin/env python3 -tt
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 import datetime
 from ipaddress import IPv4Network, IPv4Address
-from random import choices, getrandbits, randint
-from contextlib import contextmanager
+import json
 import os
+from random import choices, getrandbits, randint
 from pathlib import Path
 import string
 import subprocess
@@ -41,9 +42,13 @@ def get_date_string():
 
 
 def get_lappland_ip():
-    # todo(rodney): add jq command here to extract ip address from
-    # terraform output
-    return '0.0.0.0'
+    with open('terraform-output.json') as json_file:
+        json_dict = json.load(json_file)
+        return json_dict.external_ip.value
+    response = input(
+        "Was not able to retreive lappland ip address from"
+        + "terraform output.  Please enter the IP (e.g. 100.101.102.103)")
+    return response
 
 
 def get_random_server_name():
