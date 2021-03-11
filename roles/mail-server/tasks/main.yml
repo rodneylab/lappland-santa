@@ -252,7 +252,13 @@
     mode: 0644
     backup: yes
 
-- name: dovecot login class created
+- name: Dovecot DH parameter generation started
+  openssl_dhparam:
+    path: /etc/dovecot/dh.pem
+    async: 240
+    poll: 0
+
+- name: Dovecot login class created
   blockinfile:
     path: /etc/login.conf
     block: |
