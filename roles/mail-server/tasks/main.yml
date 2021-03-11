@@ -379,6 +379,17 @@
   notify:
     - restart smtpd
 
+- name: Checked for existing secrets.db
+  stat:
+    path: /etc/mail/secrets.db
+  register: secrets_db
+
+- name: Existing secrets.db backed up
+  copy:
+    src: /etc/mail/secrets.db
+    dest: /etc/mail/secrets.db.{{ ansible_date_time.iso8601_basic_short}}
+  when: secrets_db.stat.exists == True
+
 - name: secrets db created
   shell: "cd /etc/mail && /usr/sbin/makemap secrets"
   args:
