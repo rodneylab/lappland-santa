@@ -1,1 +1,1 @@
-version: STSv1 mode: enforce mx: {{ mail_server }} max_age: 10368000
+version: STSv1mode: enforcemx: {{ mail_server }}max_age: 10368000

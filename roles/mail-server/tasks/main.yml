@@ -224,6 +224,12 @@
     state: started
     enabled: yes
 
+- name: httpd.conf deployed
+  template:
+    src: httpd.conf
+    dest: "/etc/"
+    backup: yes
+
 - name: SRS key generated
   shell: openssl rand -base64 30
   ignore_errors: true
