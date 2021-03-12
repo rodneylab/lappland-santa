@@ -1,10 +1,16 @@
-variable "bucket" {}
+variable "bucket" {
+  description = "The name of the bucket to create."
+  type        = string
+}
 variable "image" {}
 variable "image_file" {}
 variable "image_name" {}
-variable "image_family" { default = "openbsd-amd64-68" }
-variable "project_id" {}
+variable "project_id" {
+  description = "The ID of the project in which to provision resources."
+  type        = string
+}
 variable "region" {}
+variable "service_account" {}
 
 terraform {
   required_providers {
@@ -13,6 +19,7 @@ terraform {
       version = "3.58.0"
     }
   }
+  required_version = ">= 0.12"
 }
 
 resource "google_project_service" "service" {
@@ -27,39 +34,36 @@ resource "google_project_service" "service" {
 }
 
 resource "google_storage_bucket" "lappland-openbsd-images" {
-  name                        = var.bucket
-  location                    = "EUROPE-WEST2"
-  project                     = var.project_id
-  storage_class               = "STANDARD"
-  requester_pays              = true
+  name          = var.bucket
+  project       = var.project_id
+  location      = "EUROPE-WEST2"
+  storage_class = "STANDARD"
+  # requester_pays              = true
   uniform_bucket_level_access = true
   force_destroy               = true
   lifecycle_rule {
-    condition {
-      age = 60
-    }
     action {
       type = "Delete"
     }
+    condition {
+      age        = 60
+      with_state = "ANY"
+    }
   }
+
+  # iam_members = [{
+  #   role = "roles/storage.viewer"
+  #   # member = "user:example-user@example.com"
+  #   member = var.service_account
+  # }]
 }
 
-resource "google_storage_bucket_object" "lappand-vpn-image" {
+resource "google_storage_bucket_object" "lappand-santa-image" {
+  bucket = var.bucket
   name   = var.image_file
   source = var.image
-  bucket = var.bucket
 }
 
-# resource "google_compute_image" "lappland_vpn_image" {
-#   name = var.image_name
-#   raw_disk {
-#     source = "gs://${var.bucket}/${var.image_file}"
-#     # sha1 = "003b5dca54c0931480a5e055659140b94cf87d76" hash bedfore extracting
-#   }
-#   family  = var.image_family
-#   project = var.project_id
-# }
-
 output "image_hash" {
-  value = google_storage_bucket_object.lappand-vpn-image.md5hash
+  value = google_storage_bucket_object.lappand-santa-image.md5hash
 }

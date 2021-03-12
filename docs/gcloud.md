@@ -26,7 +26,13 @@ gcloud iam service-accounts keys create ${CREDENTIALS} \
   --iam-account lappland-santa@${PROJECT_ID}.iam.gserviceaccount.com
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
   --member serviceAccount:lappland-santa@${PROJECT_ID}.iam.gserviceaccount.com \
+  --role roles/viewer
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+  --member serviceAccount:lappland-santa@${PROJECT_ID}.iam.gserviceaccount.com \
   --role roles/compute.admin
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+  --member serviceAccount:lappland-santa@${PROJECT_ID}.iam.gserviceaccount.com \
+  --role roles/storage.admin
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
   --member serviceAccount:lappland-santa@{PROJECT_ID} iam.gserviceaccount.com \
   --role roles/iam.serviceAccountUser
