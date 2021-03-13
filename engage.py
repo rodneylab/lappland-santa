@@ -46,7 +46,7 @@ def get_lappland_ip():
         json_dict = json.load(json_file)
         return json_dict.external_ip.value
     response = input(
-        "Was not able to retreive lappland ip address from"
+        "We were not able to retreive lappland ip address from"
         + "terraform output.  Please enter the IP (e.g. 100.101.102.103)")
     return response
 
@@ -151,7 +151,8 @@ def main():
     env_copy['TF_VAR_ssh_port'] = str(parameters['ssh_port'])
     env_copy['TF_VAR_wg_port'] = str(parameters['wg_port'])
     env_copy['TF_VAR_firewall_select_source'] = firewall_select_source
-    env_copy['TF_VAR_lappland_id'] = 'lappland-b'
+    env_copy['TF_VAR_lappland_id'] = get_config_parameter(
+        'lappland-id', parameters, 'lappland')
     env_copy['TF_VAR_ssh_key'] = admin_account + ':' \
         + get_ssh_public_key(get_ssh_key_name())
 
