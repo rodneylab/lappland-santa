@@ -92,13 +92,13 @@ pass in on egress proto tcp from <ssh_clients_public> \
   (max-src-conn 5, max-src-conn-rate 5/60, overload <brutes> flush global)
 
 block in log on $wguard from $wguard:network to $wguard:network
-pass in on $wguard proto tcp from $wguard:network port $unpriv_ports \
+pass in quick on $wguard proto tcp from $wguard:network port $unpriv_ports \
   to $wguard:0 port $ssh_port flags S/SA modulate state \
   (max-src-conn 5, max-src-conn-rate 5/60, overload <brutes> flush global)
 
 # submission from mail user agents
 pass in quick on $wguard proto tcp from $wguard:network \
-  to $wguard:0 port { 465, 587} flags S/SA modulate state \
+  to $wguard:0 port { 465, 587 } flags S/SA modulate state \
   (max-src-conn 50, max-src-conn-rate 50/5, overload <bruteforce> flush global)
 
 # mua email access imaps
