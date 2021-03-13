@@ -261,7 +261,7 @@
 - name: Dovecot DH parameter generation started
   openssl_dhparam:
     path: /etc/dovecot/dh.pem
-    async: 240
+    async: 14400
     poll: 0
 
 - name: Dovecot login class created
