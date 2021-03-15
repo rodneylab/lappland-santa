@@ -4,10 +4,6 @@
     path: /etc/wireguard/peers
     state: absent
 
-- name: Register Cloudflare Warp endpoint
-  shell: cat /root/git/wgcf/wgcf-profile.conf | grep Endpoint | grep -Eo "[0-9]{3,5}$"
-  register: warp_wguard_port
-
 - name: Deploy pf.rules
   template:
     src: pf.rules
