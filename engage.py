@@ -181,8 +181,9 @@ def main():
     env_copy['LAPPLAND_DOMAIN'] = get_config_parameter(
         'domain', parameters, "example.com")
     env_copy['LAPPLAND_SERVER_IP'] = get_lappland_ip()
-    env_copy['MAIL_CLIENTS'] = get_config_parameter(
+    mail_clients = get_config_parameter(
         'mail_clients', parameters, "0.0.0.0/0")
+    env_copy['MAIL_CLIENTS'] = mail_clients
     ssh_private_key_file = get_ssh_key_name()
     env_copy['SSH_PRIVATE_KEY_FILE'] = ssh_private_key_file
     ssh_clients = get_config_parameter(
@@ -202,7 +203,9 @@ def main():
 
     # update lappland properties file
     properties = {
+      'admin_account': admin_account,
       'lappland_server_name': server_name,
+      'mail_clients': mail_clients,
       'ssh_clients': ssh_clients,
       'ssh_port': str(parameters['ssh_port']),
       'ssh_private_key_file': ssh_private_key_file,
