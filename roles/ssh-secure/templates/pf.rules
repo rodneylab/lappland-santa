@@ -1,16 +1,14 @@
 ## Interfaces
-services = "lo100"
-warp = "wg10"
 wguard = "wg0"
+
+## Misc
+icmp_types = "{ unreach code port-unr, unreach code needfrag }"
 
 ## Ports
 lappland_wg_tcp_ports = "{ 443, 53, {{ ssh_port }}, 9090 }"
 lappland_wg_udp_ports = "{ 443, 3478, 53 }"
-local_services_tcp_ports = "{ 443, 53 }"
-local_services_udp_ports = "{ 443, 53, 123 }"
-public_tcp_ports = \
-  "{ 53, 443, 80, 43, 22, 993, 465, 853, 2083, 2096, 5223, 1551, 9600, 587, 5432 }"
-public_udp_ports = "{ 53, 51820, 8443, 3478, 443, 123 }"
+public_tcp_ports = "{ 53, 443, 80, 43, 22, 465, 587 }"
+public_udp_ports = "{ 53, 51820, 443, 123 }"
 ssh_port = "{{ ssh_port }}"
 unpriv_ports = "1024:65535"
 vpn_wg_tcp_ports = \
@@ -18,8 +16,9 @@ vpn_wg_tcp_ports = \
 vpn_wg_udp_ports = "{ 123, 53, 3478, 51820 }"
 
 # Tables
+table <bruteforce> persist
 table <blocklist> persist file "/etc/pf/blocklist"
-table <cloudflare-ip-list> persist file "/etc/pf/cloudflare-ip-list"
+table <mail_clients_public> persist { {{ mail_clients }} }
 table <ssh_clients_public> persist { {{ ssh_clients }} }
 table <wguard_peers_public> persist { {{ wireguard_peers }} }
 
@@ -36,17 +35,11 @@ set skip on lo0
 # Normalisation
 match in all scrub (no-df random-id max-mss 1420)
 match in on $wguard scrub (no-df random-id max-mss 1340)
-match in on $warp scrub (no-df random-id max-mss 1240)
 
 # Queuing
 # see /etc/pf.conf
 
 # Translation
-match out on egress inet tagged WG_PEER_INTERNET \
-  nat-to (egress:0) port 1024:65535 tag WG_PEER_INTERNET_NAT
-pass out on egress inet tagged WG_PEER_INTERNET_NAT
-match out on $warp from $wguard:network to ! $wguard:network \
-  nat-to $warp port 1024:65535
 
 # Filtering
 block drop in log quick from no-route to any
@@ -54,10 +47,12 @@ block drop in log quick from urpf-failed label uRPF
 block log quick from any to lo0:network
 block in log quick on egress from any to <martians>
 block return out log on egress from any to <martians>
-block drop log on { egress $warp $wguard }
+block drop log on { egress $wguard }
 block log quick from any to <blocklist>
-antispoof log quick for { egress $warp $wguard }
+block log quick from { <blocklist>, <bruteforce> }
+antispoof log quick for { egress $wguard }
 block drop in log quick inet from any to localhost
+pass inet proto icmp all icmp-type $icmp_types keep state max-pkt-rate 100/10
 
 # block stateless IPv4 traffic
 block return log inet all
@@ -68,44 +63,48 @@ pass in log proto tcp from any to any flags R/R \
 
 # ssh block
 block in log quick proto tcp from <brutes> to any label BRUTES_FROM_EXTERNAL
+#pass in on egress proto tcp to egress:0 port $ssh_port \
+#  flags S/SA modulate state \
+#  (max-src-conn 5, max-src-conn-rate 5/60, overload <brutes> flush global)
+
+# accept mail from other MTAs
+pass in quick on egress proto tcp from any to egress:0 port = 25
+
+# submission from mail user agents
+pass in quick on egress proto tcp from <mail_clients_public> \
+  to egress:0 port { 465, 587} flags S/SA modulate state \
+  (max-src-conn 50, max-src-conn-rate 50/5, overload <bruteforce> flush global)
+
+# mua email access imaps
+pass in quick on egress proto tcp from <mail_clients_public> \
+  to egress:0 port = 993 flags S/SA modulate state \
+  (max-src-conn 50, max-src-conn-rate 100/5, overload <bruteforce> flush global)
+
+# let's encrypt
+pass in quick on egress proto tcp from any to egress:0 port { 80, 443 }
 
 pass in quick on egress proto udp from <wguard_peers_public> \
   to egress:0 port = {{ wireguard_port }}
-pass out quick on egress inet proto udp from egress:0 \
-  to <cloudflare-ip-list> port = {{ warp_wguard_port.stdout }}
 pass out quick on egress proto tcp from egress:0 to any port $public_tcp_ports
 pass out quick on egress proto udp from egress:0 to any port $public_udp_ports
-pass out quick on $warp proto tcp from $warp:0 to any port $public_tcp_ports
-pass out quick on $warp proto udp from $warp:0 to any port $public_udp_ports
 #pass in on egress proto tcp from <ssh_clients_public> \
 #  to egress:0 port $ssh_port flags S/SA modulate state \
 #  (max-src-conn 5, max-src-conn-rate 5/60, overload <brutes> flush global)
 
 block in log on $wguard from $wguard:network to $wguard:network
 pass in quick on $wguard proto tcp from $wguard:network port $unpriv_ports \
-  to $services:0 port $local_services_tcp_ports modulate state \
-  (max-src-conn 10, max-src-conn-rate 30/60, overload <overactive_hosts> flush)
-pass in quick on $wguard proto udp from $wguard:network port $unpriv_ports \
-  to $services:0 port $local_services_udp_ports keep state \
-  (max-src-conn 10, max-src-conn-rate 30/60, overload <overactive_hosts> flush)
-pass in quick on $wguard proto tcp from $wguard:network port $unpriv_ports \
   to $wguard:0 port $ssh_port flags S/SA modulate state \
   (max-src-conn 5, max-src-conn-rate 5/60, overload <brutes> flush global)
 
+# submission from mail user agents
 pass in quick on $wguard proto tcp from $wguard:network \
-  to { ! $wguard:network, ! $services:0 } port $vpn_wg_tcp_ports \
-  route-to ($warp $warp:network) \
-  modulate state (if-bound) tag WARP_OUT
-pass in quick on $wguard proto udp from $wguard:network \
-  to { ! $wguard:network, ! $services:0 } port $vpn_wg_tcp_ports \
-  route-to ($warp $warp:network) \
-  keep state (if-bound) tag WARP_OUT
-pass in on $wguard proto tcp from $wguard:network \
-  to ! $wguard:network port $vpn_wg_tcp_ports modulate state (if-bound) \
-  tag WG_PEER_INTERNET
-pass in on $wguard proto udp from $wguard:network \
-  to ! $wguard:network port $vpn_wg_udp_ports keep state (if-bound) \
-  tag WG_PEER_INTERNET
+  to $wguard:0 port { 465, 587 } flags S/SA modulate state \
+  (max-src-conn 50, max-src-conn-rate 50/5, overload <bruteforce> flush global)
+
+# mua email access imaps
+pass in quick on $wguard proto tcp from $wguard:network \
+  to $wguard:0 port = 993 flags S/SA modulate state \
+  (max-src-conn 50, max-src-conn-rate 100/5, overload <bruteforce> flush global)
 
 pass out on egress proto udp from egress:0 port 67:68 \
   to 169.254.169.254 port 67:68
