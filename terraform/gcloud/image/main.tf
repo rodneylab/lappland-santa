@@ -10,7 +10,7 @@ variable "project_id" {
   type        = string
 }
 variable "region" {}
-variable "service_account" {}
+# variable "service_account" {}
 
 terraform {
   required_providers {
