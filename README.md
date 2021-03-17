@@ -1,7 +1,21 @@
 # 📮 Lappland Santa
 **WARNING** this project is still under development.  Some functionality may not behave as expected. Do not rely on any output generated. ❗️
 
-Lappland Santa is a security-focused, self-hosted, cloud mail server running on OpenBSD.  OpenBSD is a <a aria-label="Learn more about Open B S D" href="https://www.openbsd.org/" target="_blank" rel="noopener noreferrer">proactively secure</a> UNIX-like operating system.  The mail server supports modern protocols like IMAP and uses trusted tools like Dovecot, OpenSMTPD, RSpamD and Redis to deliver reliability and security.
+Lappland Santa is a security-focused, self-hosted, cloud mail server running on OpenBSD.  OpenBSD is a <a aria-label="Learn more about Open B S D" href="https://www.openbsd.org/" target="_blank" rel="noopener noreferrer">proactively secure</a> UNIX-like operating system.  The mail server supports modern protocols like IMAP and uses trusted tools like Dovecot, OpenSMTPD, Rspamd and Redis to deliver reliability and security.
+
+## 🌟 Features
+
+- **A+** rating from <a aria-label="Open the Mozilla Observatory site" href="https://observatory.mozilla.org/" target="_blank" rel="noopener noreferrer">Mozilla Observatory</a>, <a aria-label="Open the Qualys S S L Labs site" href="https://www.ssllabs.com/index.html" target="_blank" rel="noopener noreferrer">Qualys SSL Labs</a>, <a aria-label="Open Immuni Web site:wait" href="https://www.immuniweb.com/" target="_blank" rel="noopener noreferrer">ImmuniWeb</a> and <a aria-label="Open the security headers dot com site" href="https://securityheaders.com/" target="_blank" rel="noopener noreferrer">securityheaders.com</a> for generated security headers.
+- Modern encrypted email support for secure smtps prootocol with STARTLS backward-compatibility.
+- Email security server DNS records generated:
+    - **BIMI**
+    - **SPF**
+    - **DKIM**
+    - **DMARC**
+    - **MTA STS**
+- Supports generation of **client certificates** for added security to verify email senders.
+- Optional SSH access via a **WireGuard** tunnel.
+- Optional multifactor (MFA/2FA) for server SSH access.
 
 ## ☁️ Cloud Platform Setup
 Currently only Google Cloud is supported.  Follow the <a href="./docs/gcloud.md">Google Cloud Platform setup instructions</a> before creating your cloud VPN instance.
