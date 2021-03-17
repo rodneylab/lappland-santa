@@ -4,11 +4,13 @@ from contextlib import contextmanager
 import datetime
 from ipaddress import IPv4Network, IPv4Address
 import json
+import netaddr
 import os
-from random import choices, getrandbits, randint
 from pathlib import Path
+from random import choices, getrandbits, randint
 import string
 import subprocess
+import time
 import yaml
 
 
@@ -41,14 +43,27 @@ def get_date_string():
     return datetime.datetime.now().strftime('%Y-%m-%d')
 
 
+def get_image_path():
+    response = input('Please enter the path to your .tar.gz OpenBSD image\n')
+    path = Path(response)
+    if path.is_file():
+        print('Thanks for your help.')
+        return path
+    print('We can\'t find that file.  Would you mind checking the path is '
+          + 'correct?')
+    return get_image_path()
+
+
 def get_lappland_ip():
     with open('terraform-output.json') as json_file:
-        json_dict = json.load(json_file)
-        return json_dict.external_ip.value
-    response = input(
-        "We were not able to retreive lappland ip address from"
-        + "terraform output.  Please enter the IP (e.g. 100.101.102.103)")
-    return response
+        json_dict = json.loads(json_file.read())
+        ip = json_dict['external_ip']['value']
+        if netaddr.valid_ipv4(ip) or netaddr.valid_ipv6(ip):
+            return ip
+        response = input(
+            "We were not able to retreive lappland ip address from"
+            + "terraform output.  Please enter the IP (e.g. 100.101.102.103)")
+        return response
 
 
 def get_random_server_name():
@@ -59,7 +74,14 @@ def get_random_server_name():
 
 
 def get_ssh_key_name():
-    return './configs/id_ed25519_lappland_' + get_date_string()
+    default_name = './configs/id_ed25519_lappland_' + get_date_string()
+    path = Path('./configs/properties.yml')
+    if path.is_file():
+        with open(str(path)) as file:
+            properties = yaml.load(file, Loader=yaml.FullLoader)
+            return get_config_parameter(
+                'ssh_private_key_file', properties, default_name)
+    return default_name
 
 
 def get_ssh_public_key(filename):
@@ -136,15 +158,19 @@ def main():
     command = ['sh', 'generate-ssh-keys.sh', get_ssh_key_name()]
     subprocess.check_call(command, env=env_copy)
 
-    # todo(rodney): prompt for image path
-    env_copy['TF_VAR_image'] = '../../../../openbsd-amd64-68-210227.tar.gz'
-    env_copy['TF_VAR_image_name'] = 'openbsd-amd64-68-210227'
-    env_copy['TF_VAR_image_file'] = 'openbsd-amd64-68-210227.tar.gz'
+    image_path = get_image_path()
+    time.sleep(2)
+    env_copy['TF_VAR_image'] = str('../../../' / image_path)
+    env_copy['TF_VAR_image_name'] = Path(image_path.stem).stem
+    env_copy['TF_VAR_image_file'] = image_path.name
     env_copy['TF_VAR_image_family'] = 'openbsd-amd64-68'
     env_copy['TF_VAR_mail_server'] = get_config_parameter(
         'mail_server', parameters, '')
 
-    env_copy['TF_VAR_bucket'] = 'lappland-openbsd-images-2021-03-02'
+    bucket_name = input(
+        "Could you enter a name for the bucket (e.g. 'my-openbsd-images')? ")
+    print('Thanks')
+    env_copy['TF_VAR_bucket'] = bucket_name
     env_copy['TF_VAR_project_id'] = os.getenv('GOOGLE_PROJECT')
     env_copy['TF_VAR_region'] = region
     env_copy['TF_VAR_server_name'] = server_name
