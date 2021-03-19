@@ -90,7 +90,7 @@
     - restart smtpd
 
 - name: newaliases run
-  shell: newaliases
+  shell: /usr/bin/newaliases
   ignore_errors: true
   changed_when: false
   check_mode: no
