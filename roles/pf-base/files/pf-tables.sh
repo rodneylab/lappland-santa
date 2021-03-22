@@ -68,7 +68,7 @@ printf "\n"
 wc -l $custom
 
 # Create blocklist file
-if [-s $threats ] && [ -s $zones ]; then
+if [ -s $threats ] && [ -s $zones ]; then
   sort $threats $custom $zones | uniq > $blocklist
   wc -l $blocklist
   #if [[ ! -s $blocklist ]]; then
