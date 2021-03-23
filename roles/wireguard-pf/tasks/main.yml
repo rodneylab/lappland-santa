@@ -6,7 +6,7 @@
     owner: root
     group: wheel
     mode: 0600
-    backup: no
+    backup: false
 
 - name: pf.rules deployed
   template:
@@ -15,7 +15,7 @@
     owner: root
     group: wheel
     mode: 0600
-    backup: no
+    backup: false
   notify:
     - restart pf
 
@@ -27,4 +27,4 @@
 - name: anchor reloaded
   shell: "/sbin/pfctl -a pf.rules -F Tables && /sbin/pfctl -a pf.rules -f /etc/pf.anchors/pf.rules"
   changed_when: false
-  check_mode: no
+  check_mode: false
