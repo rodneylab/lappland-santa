@@ -11,7 +11,7 @@
     owner: sshd
     group: wheel
     mode: 0600
-  no_log: True
+  no_log: true
 
 - name: Setup instructions deployed
   copy:
