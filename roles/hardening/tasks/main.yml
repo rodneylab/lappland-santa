@@ -16,10 +16,10 @@
 - name: Accounting enabled
   shell: "/usr/sbin/rcctl enable accounting"
 
-- name : /usr/local/sbin added to mtree
+- name: /usr/local/sbin added to mtree
   shell: "/usr/sbin/mtree -cx -p /usr/local/sbin -K sha256digest,type > /etc/mtree/usr.local.sbin.secure"
   changed_when: false
-  check_mode: no
+  check_mode: false
 
 - name: custom mtree file permissions hardened
   file:
