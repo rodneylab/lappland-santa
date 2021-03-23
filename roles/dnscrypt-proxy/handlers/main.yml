@@ -1,5 +1,5 @@
 - name: start dnscrypt-proxy
   service:
-    enabled: yes
+    enabled: true
     name: dnscrypt_proxy
     state: started

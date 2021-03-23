@@ -19,11 +19,11 @@
     owner: root
     group: wheel
     mode: 0644
-    backup: yes
+    backup: true
   with_items:
-    - { src: 'dnscrypt-proxy.toml', dest: '/etc/dnscrypt-proxy.toml'}
-    - { src: 'ip-blacklist.txt', dest: '/etc/dnscrypt-proxy/ip-blacklist.txt'}
-    - { src: 'whitelist.txt', dest: '/etc/dnscrypt-proxy/whitelist.txt'}
+    - {src: 'dnscrypt-proxy.toml', dest: '/etc/dnscrypt-proxy.toml'}
+    - {src: 'ip-blacklist.txt', dest: '/etc/dnscrypt-proxy/ip-blacklist.txt'}
+    - {src: 'whitelist.txt', dest: '/etc/dnscrypt-proxy/whitelist.txt'}
 
 - name: Deploy dnscrypt-proxy-blacklist.sh
   template:
@@ -32,7 +32,7 @@
     owner: root
     group: wheel
     mode: 0750
-    backup: no
+    backup: false
 
 - name: dnscrypt-proxy blacklist downloaded
   get_url:
@@ -60,7 +60,7 @@
   copy:
     content: ""
     dest: "{{ item }}"
-    force: no
+    force: false
     owner: root
     group: wheel
     mode: 0644
@@ -75,4 +75,4 @@
   service:
     name: dnscrypt_proxy
     state: restarted
-    enabled: yes
+    enabled: true
