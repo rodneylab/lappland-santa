@@ -115,7 +115,8 @@
     - restart pf
 
 - name: blocklist updated
-  shell: "sh /etc/pf/pf-tables.sh"
+  command:
+    cmd: sh /etc/pf/pf-tables.sh
   changed_when: false
   check_mode: false
 
