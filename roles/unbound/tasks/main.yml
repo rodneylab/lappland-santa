@@ -5,15 +5,16 @@
     dest: /var/unbound/etc/unbound.conf
     owner: root
     group: wheel
-    mode: 644
-    backup: yes
+    mode: 0644
+    backup: true
   notify:
     - enable unbound
 
 - name: unbound enabled
-  shell: "rcctl enable unbound"
+  command:
+    cmd: rcctl enable unbound
   changed_when: false
-  check_mode: no
+  check_mode: false
 
 - name: unbound log folder created
   file:
@@ -27,7 +28,7 @@
   copy:
     content: ""
     dest: /var/unbound/log/unbound.log
-    force: no
+    force: false
     owner: _unbound
     group: wheel
     mode: 0644
@@ -35,14 +36,15 @@
     - start unbound
 
 - name: checked for root.key for dnssec
-  shell: "ls /var/unbound/db/root.key"
+  command:
+    cmd: ls /var/unbound/db/root.key
   register: rootkey
   ignore_errors: true
   changed_when: false
-  check_mode: no
+  check_mode: false
 
 - name: unbound root.key created
-  shell: unbound-anchor -a "/var/unbound/db/root.key"
+  command: unbound-anchor -a "/var/unbound/db/root.key"
   args:
     creates: /var/unbound/db/root.key
   register: createrootkey
@@ -58,7 +60,7 @@
     owner: "{{ admin_account }}"
     group: admins
     mode: 0755
-    backup: no
+    backup: false
 
 - name: unbound blocklist whitelist deployed
   template:
@@ -67,7 +69,7 @@
     owner: "{{ admin_account }}"
     group: admins
     mode: 0644
-    backup: no
+    backup: false
 
 - name: restart-unbound script deployed
   template:
@@ -76,12 +78,15 @@
     owner: root
     group: wheel
     mode: 0750
-    backup: no
+    backup: false
 
 - name: zone-block-general.conf run
-  shell: "sh /var/unbound/etc/zone-block.sh"
+  command:
+  args:
+    cmd: sh /var/unbound/etc/zone-block.sh
+    creates: /var/unbound/etc/zone-block-general.conf
   changed_when: false
-  check_mode: no
+  check_mode: false
   notify:
     - restart unbound
 
@@ -92,7 +97,7 @@
     owner: root
     group: wheel
     mode: 0644
-    backup: no
+    backup: false
 
 - name: dhclient.conf deployed
   template:
@@ -101,7 +106,7 @@
     owner: root
     group: wheel
     mode: 0644
-    backup: no
+    backup: false
 
 - name: zone-block script added to cron
   cron:
@@ -115,4 +120,4 @@
   service:
     name: unbound
     state: started
-    enabled: yes
+    enabled: true
