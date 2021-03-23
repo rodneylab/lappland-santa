@@ -1,3 +1,4 @@
 - name: reboot the server
-  shell: reboot
+  command:
+    cmd: reboot
   failed_when: false
