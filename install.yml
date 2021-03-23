@@ -3,12 +3,11 @@
 
 - hosts: 127.0.0.1
   roles:
-    - { role: users, tags: users }
-    - { role: system, tags: system }
-    - { role: sysctl, tags: sysctl }
-    - { role: pf-base, tags: pf-base }
-    - { role: dnscrypt-proxy, tags: dnscrypt-proxy }
-    - { role: unbound, tags: unbound }
-    - { role: encrypted-dns, tags: encrypted-dns }
-    - { role: hardening, tags: hardening }
-    - { role: reboot, tags: reboot }
+    - {role: users, tags: users}
+    - {role: system, tags: system}
+    - {role: sysctl, tags: sysctl}
+    - {role: pf-base, tags: pf-base}
+    - {role: dnscrypt-proxy, tags: dnscrypt-proxy}
+    - {role: unbound, tags: unbound}
+    - {role: hardening, tags: hardening}
+    - {role: reboot, tags: reboot}
