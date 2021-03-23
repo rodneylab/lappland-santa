@@ -1,9 +1,4 @@
 ---
-- name: All packages on the system updated
-  openbsd_pkg:
-    name: '*'
-    state: latest
-
 - name: System packages installed
   openbsd_pkg:
     name:
@@ -20,7 +15,7 @@
     owner: root
     group: operator
     mode: 0644
-    force: yes
+    force: true
 
 - name: /etc/doas.conf deployed
   template:
@@ -61,13 +56,14 @@
     owner: root
     group: wheel
     mode: 0640
-    backup: no
+    backup: false
 
 - name: lo100 interface brought up
-  shell: sh /etc/netstart lo100
+  command:
+    cmd: sh /etc/netstart lo100
   ignore_errors: true
   changed_when: false
-  check_mode: no
+  check_mode: false
 
 - name: ntpd.conf deployed
   template:
@@ -116,4 +112,4 @@
     owner: root
     group: wheel
     mode: 0644
-    backup: no
+    backup: false
