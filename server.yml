@@ -6,29 +6,29 @@
 
   tasks:
     - block:
-      - name: Add the server to an inventory group
-        add_host:
-          name: "{% if lappland_server_ip == 'localhost' %}localhost{% else %}{{ lappland_server_ip }}{% endif %}"
-          groups: vpn-host
-          ansible_connection: "{% if lappland_server_ip == 'localhost' %}local{% else %}ssh{% endif %}"
-          ansible_ssh_user: "{{ ssh_user }}"
-          ansible_ssh_port: "{{ ssh_port }}"
-          ansible_python_interpreter: "/usr/local/bin/python3"
-          lappland_server_name: "{{ lappland_server_name }}"
+        - name: Add the server to an inventory group
+          add_host:
+            name: "{% if lappland_server_ip == 'localhost' %}localhost{% else %}{{ lappland_server_ip }}{% endif %}"
+            groups: vpn-host
+            ansible_connection: "{% if lappland_server_ip == 'localhost' %}local{% else %}ssh{% endif %}"
+            ansible_ssh_user: "{{ ssh_user }}"
+            ansible_ssh_port: "{{ ssh_port }}"
+            ansible_python_interpreter: "/usr/local/bin/python3"
+            lappland_server_name: "{{ lappland_server_name }}"
 
-      - name: Additional variables for the server
-        add_host:
-          name: "{{ lappland_server_ip }}"
-          ansible_ssh_private_key_file: "{{ ssh_private_key_file }}"
+        - name: Additional variables for the server
+          add_host:
+            name: "{{ lappland_server_ip }}"
+            ansible_ssh_private_key_file: "{{ ssh_private_key_file }}"
 
-      - name: Wait until SSH becomes ready...
-        wait_for:
-          port: "{{ ssh_port }}"
-          host: "{{ lappland_server_ip }}"
-          search_regex: "OpenSSH"
-          delay: 10
-          timeout: 320
-          state: present
+        - name: Wait until SSH becomes ready...
+          wait_for:
+            port: "{{ ssh_port }}"
+            host: "{{ lappland_server_ip }}"
+            search_regex: "OpenSSH"
+            delay: 10
+            timeout: 320
+            state: present
 
 - name: Configure the server and install required software
   hosts: vpn-host
