@@ -15,7 +15,7 @@
     owner: root
     group: wheel
     mode: 0644
-    backup: no
+    backup: false
   loop:
     - prometheus.yml
     - targets.json
@@ -27,5 +27,5 @@
     owner: root
     group: bin
     mode: 0755
-    backup: no
+    backup: false
   notify: start monitoring daemons
