@@ -1,8 +1,10 @@
 #!/bin/sh
 PF_WORKING_DIR="/etc/pf"
 ASNS_DIR="${PF_WORKING_DIR}"/asns
+ALLOW_ASNS_DIR="${PF_WORKING_DIR}"/allow-asns
 BLOCK_ASNS_DIR="${PF_WORKING_DIR}"/block-asns
 OUTPUT_DIR="${PF_WORKING_DIR}"/output
+allowlist="${OUTPUT_DIR}"/allowlist.$(date +%F)
 blocklist="${OUTPUT_DIR}"/blocklist.$(date +%F)
 custom="${OUTPUT_DIR}"/custom.$(date +%F)
 threats="${OUTPUT_DIR}"/threats.$(date +%F)
@@ -71,11 +73,17 @@ wc -l $custom
 if [ -s $threats ] && [ -s $zones ]; then
   sort $threats $custom $zones | uniq > $blocklist
   wc -l $blocklist
-  #if [[ ! -s $blocklist ]]; then
-  #  printf "Error empty file: "$blocklist"\n"; exit 1
-  #fi
-  cp $blocklist /etc/pf/blocklist
 fi
+
+# Create allowlist file
+rm $allowlist 2>/dev/null
+touch $allowlist
+create_table_file_from_asns_folder "$allowlist" "$ALLOW_ASNS_DIR"
+printf "\n"
+wc -l $allowlist
+
+# apply allowlist to blocklist and merge cidr ranges where possible
+python3 /etc/pf/build-blocklist.py $blocklist $allowlist /etc/pf/blocklist
 
 # Create cloudflare table
 create_table_file_from_asns_file "$cloudflare" "${ASNS_DIR}/cloudflare"

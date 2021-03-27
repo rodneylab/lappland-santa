@@ -67,6 +67,7 @@
   with_items:
     - /etc/pf/asns
     - /etc/pf/block-asns
+    - /etc/pf/allow-asns
     - /etc/pf/output
 
 - name: block-asns files deployed
@@ -79,6 +80,19 @@
     backup: true
   with_items:
     - {src: 'myspace', dest: '/etc/pf/block-asns/myspace'}
+
+- name: allow-asns files deployed
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ admin_account }}"
+    group: wheel
+    mode: 0640
+    backup: true
+  with_items:
+    - {src: 'apple', dest: '/etc/pf/allow-asns/apple'}
+    - {src: 'aws', dest: '/etc/pf/allow-asns/aws'}
+    - {src: 'github', dest: '/etc/pf/allow-asns/github'}
 
 - name: asns files deployed
   copy:
@@ -94,14 +108,17 @@
     - 'google'
     - 'netflix'
 
-- name: pf-tables script deployed
+- name: pf-tables scripts deployed
   copy:
-    src: pf-tables.sh
+    src: "{{ item }}"
     dest: /etc/pf/
     owner: "{{ admin_account }}"
     group: admins
     mode: 0755
     backup: false
+  with_items:
+    - build-blocklist.py
+    - pf-tables.sh
 
 - name: pf.conf deployed
   template:
