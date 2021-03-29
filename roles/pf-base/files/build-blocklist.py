@@ -17,10 +17,14 @@ def get_blocklist(filename):
 def apply_allowlist_to_blocklist(blocklist, allowlist_filename):
     allowlist_file = open(allowlist_filename, 'r')
     blocklist_ipset = IPSet(blocklist)
+    allowlist = []
     for line in allowlist_file:
-        if IPNetwork(line) in blocklist_ipset:
-            print(line + ' is in blocklist, removing it!')
-            blocklist_ipset.remove(IPNetwork(line))
+        allowlist.append(IPNetwork(line))
+
+    intersection = IPSet(cidr_merge(allowlist)) & blocklist_ipset
+    for cidr in intersection.iter_cidrs():
+        print(str(cidr) + ' is in blocklist, removing it!')
+        blocklist_ipset.remove(cidr)
     blocklist_ipset.compact()
     return blocklist_ipset
 

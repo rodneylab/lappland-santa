@@ -83,7 +83,8 @@ printf "\n"
 wc -l $allowlist
 
 # apply allowlist to blocklist and merge cidr ranges where possible
-python3 /etc/pf/build-blocklist.py $blocklist $allowlist /etc/pf/blocklist
+/usr/local/bin/python3 /etc/pf/build-blocklist.py $blocklist $allowlist \
+  /etc/pf/blocklist
 
 # Create cloudflare table
 create_table_file_from_asns_file "$cloudflare" "${ASNS_DIR}/cloudflare"
