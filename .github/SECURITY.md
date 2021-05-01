@@ -5,7 +5,7 @@ The Rodney Lab team and community take all security bugs in Rodney Lab repos ser
 
 Report security bugs by emailing security@rodneylab.com.
 
-You can encrypt your message <a href="https://rodneylab.com/0xF3AC300FB4F159FE7827612473FCBF24CF9396A7-pub.asc">using this GPG public key</a>.
+You can encrypt your message <a href="https://rodneylab.com/0xF3AC300FB4F159FE7827612473FCBF24CF9396A7-pub.asc">using this PGP public key</a>.
 
 That account will acknowledge your email within 48 hours, and will send a more detailed response within 48 hours indicating the next steps in handling your report. After the initial reply to your report, we will endeavour to keep you informed of the progress towards a fix and full announcement, and may ask for additional information or guidance.
 
