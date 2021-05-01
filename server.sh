@@ -5,7 +5,7 @@ extra_vars=$( jq -n \
               --arg lappland_id "$TF_VAR_lappland_id" \
               --arg lappland_server_name "$TF_VAR_server_name" \
               --arg lappland_server_ip "$LAPPLAND_SERVER_IP" \
-              --arg mail_clients "$MAIL_CLIENTS" \
+              --arg mail_clients "$TF_VAR_mail_clients" \
               --arg mail_server "$TF_VAR_mail_server" \
               --arg peers "$PEERS" \
               --arg ssh_private_key_file "$SSH_PRIVATE_KEY_FILE" \
