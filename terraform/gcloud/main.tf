@@ -53,7 +53,7 @@ resource "google_compute_firewall" "lapplandsanta" {
   source_ranges = split(",", var.firewall_select_source)
   allow {
     protocol = "tcp"
-    ports    = [var.ssh_port, "587", "993"]
+    ports    = [var.ssh_port, "993"]
   }
   allow {
     protocol = "udp"
@@ -79,7 +79,7 @@ resource "google_compute_firewall" "lapplandsantamta" {
   direction = "INGRESS"
   allow {
     protocol = "tcp"
-    ports    = ["25", "465"]
+    ports    = ["25", "465", "587"]
   }
   target_tags = ["lappland-santa"]
 }

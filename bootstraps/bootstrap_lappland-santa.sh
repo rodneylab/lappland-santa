@@ -7,25 +7,37 @@ instance_type=$(/usr/local/bin/curl -s \
   http://metadata.google.internal/computeMetadata/v1/instance/attributes/instance-type)
 
 # check we do not want to install lappland-vpn instead
-get_instance_type() {
-  if [instance_type == 'lappland-vpn']; then
-    /usr/local/bin/curl -Lo /root/bootstrap_lappland-vpn.sh \
-      https://raw.githubusercontent.com/rodneylab/lappland-vpn/main/bootstraps/bootstrap_lappland-vpn.sh
-    sh /root/git/lappland-vpn/bootstraps/bootstrap_lappland-vpn.sh
-    exit 0
-  fi
-}
+if [instance_type == 'lappland-vpn']; then
+  /usr/local/bin/curl -Lo /root/bootstrap_lappland-vpn.sh \
+    https://raw.githubusercontent.com/rodneylab/lappland-vpn/main/bootstraps/bootstrap_lappland-vpn.sh
+  sh /root/git/lappland-vpn/bootstraps/bootstrap_lappland-vpn.sh
+  exit 0
+fi
 
 # bootstrap the system
 /usr/local/bin/curl -L \
   https://raw.githubusercontent.com/rodneylab/lappland-santa/main/bootstraps/bootstrap_raw.sh \
   | sh
 
-# get admin username
-instance_keys=$(/usr/local/bin/curl -s \
-  --resolve metadata.google.internal:80:169.254.169.254 \
-  -H "Metadata-Flavor: Google" \
-  http://metadata.google.internal/computeMetadata/v1/instance/attributes/ssh-keys)
+get_instance_keys() {
+  aws_test=$(curl -o /dev/null --silent -Iw '%{http_code}' \
+    http://169.254.169.254/latest/meta-data/)
+  if [ "$aws_test" == "200" ]; then
+      # aws
+      instance_keys="$(/usr/local/bin/curl -s \
+              http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key)"
+      echo $instance_keys
+  else
+    do
+      # gcloud
+      instance_keys=$(/usr/local/bin/curl -s \
+        --resolve metadata.google.internal:80:169.254.169.254 \
+        -H "Metadata-Flavor: Google" \
+        http://metadata.google.internal/computeMetadata/v1/instance/attributes/ssh-keys)
+      echo $instance_keys
+    done
+  fi
+}
 
 get_admin_username () {
   if [ -z "$1" ]; then
@@ -33,7 +45,8 @@ get_admin_username () {
   else
     echo "$1" | while read line
   do
-    username="$(echo $line | cut -d: -f1)"
+    # username="$(echo $line | cut -d: -f1)"
+    username="$(echo $line | awk '{print $NF}')"
     echo $username
   done
   fi
@@ -45,12 +58,14 @@ get_public_key () {
   else
     echo "$1" | while read line
   do
+    # works for both 'user:key comment' format and 'key comment' format
     user_key="$(echo $line | cut -d: -f2)"
     echo $user_key
   done
 fi
 }
 
+instance__keys = get_instance_keys
 admin_account=$(get_admin_username "$instance_keys")
 admin_ssh_public_key=$(get_public_key "$instance_keys")
 

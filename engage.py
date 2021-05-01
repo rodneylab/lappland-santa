@@ -73,8 +73,12 @@ def get_random_server_name():
     return ''.join(result)
 
 
-def get_ssh_key_name():
-    default_name = './configs/id_ed25519_lappland_' + get_date_string()
+def get_ssh_key_name(type):
+    key_type = 'ed25519'
+    if type != 'rsa':
+        key_type = type
+    default_name = './configs/id_' + key_type + '_lappland_' \
+        + get_date_string()
     path = Path('./configs/properties.yml')
     if path.is_file():
         with open(str(path)) as file:
@@ -155,7 +159,13 @@ def main():
         region = parameters['gcloud']['region']
 
     env_copy['LAPPLAND_ADMIN'] = admin_account
-    command = ['sh', 'generate-ssh-keys.sh', get_ssh_key_name()]
+    is_aws_input = input(
+        "Will you launch an AWS instance? (yes/no)")
+    key_type = 'ed25519'
+    if is_aws_input == 'yes':
+        key_type = 'rsa'
+    command = ['sh', 'generate-ssh-keys.sh', 'rsa', get_ssh_key_name(key_type)]
+
     subprocess.check_call(command, env=env_copy)
 
     image_path = get_image_path()
@@ -177,6 +187,9 @@ def main():
     env_copy['TF_VAR_ssh_port'] = str(parameters['ssh_port'])
     env_copy['TF_VAR_wg_port'] = str(parameters['wg_port'])
     env_copy['TF_VAR_firewall_select_source'] = firewall_select_source
+    mail_clients = get_config_parameter(
+        'mail_clients', parameters, "0.0.0.0/0")
+    env_copy['TF_VAR_mail_clients'] = mail_clients
     env_copy['TF_VAR_lappland_id'] = get_config_parameter(
         'lappland-id', parameters, 'lappland')
     env_copy['TF_VAR_ssh_key'] = admin_account + ':' \
@@ -207,9 +220,6 @@ def main():
     env_copy['LAPPLAND_DOMAIN'] = get_config_parameter(
         'domain', parameters, "example.com")
     env_copy['LAPPLAND_SERVER_IP'] = get_lappland_ip()
-    mail_clients = get_config_parameter(
-        'mail_clients', parameters, "0.0.0.0/0")
-    env_copy['MAIL_CLIENTS'] = mail_clients
     ssh_private_key_file = get_ssh_key_name()
     env_copy['SSH_PRIVATE_KEY_FILE'] = ssh_private_key_file
     ssh_clients = get_config_parameter(

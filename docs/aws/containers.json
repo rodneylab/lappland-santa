@@ -1,0 +1,8 @@
+{
+  "Description": "Lappland OpenBSD amd64 68 YYYYMMDD",
+  "Format": "VMDK",
+  "UserBucket": {
+      "S3Bucket": "your-s3-bucket-name",
+      "S3Key": "ami-openbsd-amd64-68-YYMMDD.vmdk"
+  }
+}
