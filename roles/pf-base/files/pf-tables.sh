@@ -60,6 +60,11 @@ for zone in $(grep -v "^#" ${PF_WORKING_DIR}/zones | sed "s/\ \ \#.*//g") ; do
     https://www.ipdeny.com/ipblocks/data/countries/$zone.zone >> $zones
 done
 printf "\n"
+if [ ! -s $zones ]
+then
+  rm -f $zones
+  zones=$(find ${OUTPUT_DIR} -name zones.\* -maxdepth 1 | sort -V | tail -n 1)
+fi
 wc -l $zones
 
 # Create custom file
