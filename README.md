@@ -1,4 +1,6 @@
 # 📮 Lappland Santa
+[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/rodneylab/lappland-santa)
+
 **WARNING** this project is still under development.  Some functionality may not behave as expected. Do not rely on any output generated. ❗️
 
 Lappland Santa is a security-focused, self-hosted, cloud mail server running on OpenBSD.  OpenBSD is a <a aria-label="Learn more about Open B S D" href="https://www.openbsd.org/" target="_blank" rel="noopener noreferrer">proactively secure</a> UNIX-like operating system.  The mail server supports modern protocols like IMAP and uses trusted tools like Dovecot, OpenSMTPD, Rspamd and Redis to deliver reliability and security.
